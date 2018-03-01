@@ -82,18 +82,18 @@ only because they are mutually exclusive: only a thread in the
 ready state is on the run queue, whereas only a thread in the
 blocked state is on a semaphore wait list. */
 struct thread
-{
-	/* Owned by thread.c. */
-	tid_t tid;                          /* Thread identifier. */
-	enum thread_status status;          /* Thread state. */
-	char name[16];                      /* Name (for debugging purposes). */
-	uint8_t *stack;                     /* Saved stack pointer. */
-	int priority;                       /* Priority. */
-	struct list_elem allelem;           /* List element for all threads list. */
+  {
+    /* Owned by thread.c. */
+    tid_t tid;                          /* Thread identifier. */
+    enum thread_status status;          /* Thread state. */
+    char name[16];                      /* Name (for debugging purposes). */
+    uint8_t *stack;                     /* Saved stack pointer. */
+    int64_t wakeup_ticks;                 /* # of ticks to next wake up */
+    int priority;                       /* Priority. */
+    struct list_elem allelem;           /* List element for all threads list. */
 
-										/* Shared between thread.c and synch.c. */
-	struct list_elem elem;              /* List element. */
-
+    /* Shared between thread.c and synch.c. */
+    struct list_elem elem;              /* List element. */
 
 #ifdef USERPROG
 										/* Owned by userprog/process.c. */
@@ -183,5 +183,9 @@ int thread_get_nice(void);
 void thread_set_nice(int);
 int thread_get_recent_cpu(void);
 int thread_get_load_avg(void);
+
+static void check_on_sleeping_threads(void);
+void thread_put_to_sleep(int64_t ticks);
+static bool sleeping_list_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED);
 
 #endif /* threads/thread.h */
