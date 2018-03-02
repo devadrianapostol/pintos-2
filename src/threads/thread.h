@@ -87,9 +87,14 @@ struct thread
     enum thread_status status;          /* Thread state. */
     char name[16];                      /* Name (for debugging purposes). */
     uint8_t *stack;                     /* Saved stack pointer. */
-    int64_t wakeup_ticks;                 /* # of ticks to next wake up */
-    int priority;                       /* Priority. */
+    int64_t wakeup_ticks;               /* # of ticks to next wake up */
+    int priority;                       /* Priority. May have been donated */
+    int original_priority;              /* If donated this is original. If not this is same as priority */
+    bool has_donated                    /* true if donated priority otherwise false */ 
     struct list_elem allelem;           /* List element for all threads list. */
+
+    /* current list of all locks thread has */
+    struct list locks_list;
 
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
@@ -142,5 +147,6 @@ int thread_get_load_avg (void);
 static void check_on_sleeping_threads(void);
 void thread_put_to_sleep(int64_t ticks);
 static bool sleeping_list_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED);
+static bool thread_priority_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED);
 
 #endif /* threads/thread.h */

@@ -209,6 +209,9 @@ thread_create (const char *name, int priority,
   /* Add to run queue. */
   thread_unblock (t);
 
+  /* check whether current thread needs to yield */
+  test_priority_yielding();
+
   return tid;
 }
 
@@ -245,7 +248,8 @@ thread_unblock (struct thread *t)
 
   old_level = intr_disable ();
   ASSERT (t->status == THREAD_BLOCKED);
-  list_push_back (&ready_list, &t->elem);
+  //list_push_back (&ready_list, &t->elem);
+  list_insert_ordered(&ready_list, &t->elem, thread_priority_less_func, NULL);
   t->status = THREAD_READY;
   intr_set_level (old_level);
 }
@@ -316,7 +320,8 @@ thread_yield (void)
 
   old_level = intr_disable ();
   if (cur != idle_thread) 
-    list_push_back (&ready_list, &cur->elem);
+    //list_push_back (&ready_list, &cur->elem);
+    list_insert_ordered(&ready_list, &cur->elem, thread_priority_less_func, NULL);
   cur->status = THREAD_READY;
   schedule ();
   intr_set_level (old_level);
@@ -344,6 +349,8 @@ void
 thread_set_priority (int new_priority) 
 {
   thread_current ()->priority = new_priority;
+  /* check if current thread needs to yield */
+  test_priority_yielding();
 }
 
 /* Returns the current thread's priority. */
@@ -646,6 +653,19 @@ thread_put_to_sleep(int64_t ticks)
 
 }
 
+/* checks to see if current thread needs to yield for higher priority thread */
+void
+test_priority_yielding(void)
+{
+  if(!list_empty(&ready_list))
+  {
+    struct thread *cur = thread_current(); 
+    struct thread *t = list_entry(list_front(&ready_list), struct thread, elem);
+    if(cur->priority < t->priority)
+      thread_yield();
+  }
+}
+
 /* used as a pointer function to compare two threads and which one should wake first */
 static bool 
 sleeping_list_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED)
@@ -655,4 +675,15 @@ sleeping_list_less_func(const struct list_elem *l, const struct list_elem *r, vo
   struct thread *right = list_entry(r, struct thread, elem);
   /* compare and return */
   return left->wakeup_ticks < right->wakeup_ticks;
+}
+
+/* used as a pointer function to compare two threads and whether l has lower priority than r */
+static bool
+thread_priority_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED)
+{
+  /* get threads */
+  struct thread *left = list_entry(l, struct thread, elem);
+  struct thread *right = list_entry(r, struct thread, elem);
+  /*compare and return */
+  return left->priority > right->priority;
 }
