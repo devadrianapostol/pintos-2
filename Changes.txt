@@ -9,5 +9,20 @@ each tick in threads.c check_on_sleeping_threads. Used
 in thread_ticks
 5. Added function to put thread to sleep thread_put_to_sleep
 used in timer_sleep. Created in thread.c
-6. Added function to compare two elements in sleeping list to sort
+6. Added function sleeping_list_list_less to compare two elements in sleeping list to sort
 in ascending order
+
+Priority Scheduling Changes 
+---------------------------------
+1.Added function thread_priority_list_less to compare two threads based on priority in thread.c
+2. Added function test_priority_yield to check if current thread needs to yield to another thread in thread.c
+3. Added test_priority_yield to threads_set_priority in thread.c
+4. Added test_priority_yield to threads_create in thread.c
+5. Changed list_push_back to list_insert_ordered in thread_yield in thread.c
+6. Changed list_push_back to list_insert_ordered in thread_unblock in thread.c
+
+Priority Donation Changes
+1. Added original_priority to threads struct in threads.h
+2. Added has_donated to threads struct in threads.h
+3. Added locks_list list to threads struct in threads.h
+4. 

@@ -22,24 +22,24 @@ main ()
         cd build
         
         alarm_single
-        # alarm_multiple
-        # alarm-simultaneous
-        # alarm-priority
-        # alarm-zero
-        # alarm-negative
+        alarm_multiple
+        alarm-simultaneous
+        alarm-priority
+        alarm-zero
+        alarm-negative
         
-        # priority-change
-        # priority-donate-one
-        # priority-donate-multiple
-        # priority-donate-multiple2
-        # priority-donate-nest
-        # priority-donate-sema
-        # priority-donate-lower
-        # priority-fifo
-        # priority-preempt
-        # priority-sema
-        # priority-condvar 
-        # priority-donate-chain
+        priority-change
+        priority-donate-one
+        priority-donate-multiple
+        priority-donate-multiple2
+        priority-donate-nest
+        priority-donate-sema
+        priority-donate-lower
+        priority-fifo
+        priority-preempt
+        priority-sema
+        priority-condvar 
+        priority-donate-chain
         
         # mlfqs-load-1
         # mlfqs-load-60
