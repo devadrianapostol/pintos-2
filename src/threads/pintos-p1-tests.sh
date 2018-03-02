@@ -22,11 +22,11 @@ main ()
         cd build
         
         alarm_single
-        # alarm_multiple
-        # alarm-simultaneous
-        # alarm-priority
-        # alarm-zero
-        # alarm-negative
+        alarm_multiple
+        alarm-simultaneous
+        alarm-priority
+        alarm-zero
+        alarm-negative
         
         # priority-change
         # priority-donate-one
