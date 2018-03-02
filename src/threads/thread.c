@@ -604,16 +604,15 @@ check_on_sleeping_threads(void)
     while(cur != list_end(&sleeping_list))
     {
       struct thread *t = list_entry(cur, struct thread, elem);
-      if(t->wakeup_ticks >= start)
+      if(t->wakeup_ticks <= start)
       {
-        list_pop_front(&sleeping_list);
+        cur = list_remove(&t->elem);
         thread_unblock(t);
-        cur = list_next(cur);
       }
       else
       {
         /* no need to continue checking */
-        return NULL;
+        cur = list_next(cur);
       }
     }
 
