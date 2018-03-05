@@ -14,7 +14,7 @@ in ascending order
 
 Priority Scheduling Changes 
 ---------------------------------
-1.Added function thread_priority_list_less to compare two threads based on priority in thread.c
+1. Added function thread_priority_list_less to compare two threads based on priority in thread.c
 2. Added function test_priority_yield to check if current thread needs to yield to another thread in thread.c
 3. Added test_priority_yield to threads_set_priority in thread.c
 4. Added test_priority_yield to threads_create in thread.c
@@ -22,7 +22,14 @@ Priority Scheduling Changes
 6. Changed list_push_back to list_insert_ordered in thread_unblock in thread.c
 
 Priority Donation Changes
-1. Added original_priority to threads struct in threads.h
-2. Added has_donated to threads struct in threads.h
-3. Added locks_list list to threads struct in threads.h
-4. 
+---------------------------------
+1. Added has_donated_priority, list_of_locks, original_priority, and waiting_lock to struct thread in thread.h
+2. Initialized all of them in init_thread in thread.c
+3. Changed sema_down and cond_wait to push list in sorted order 
+4. Added holding_lock to struct semaphore in synch.h
+5. Initialized it in sema_init in synch.c
+6. Set sema's holding_lock to lock in lock_init in synch.c
+7. Changed sema_down to account for chain donation
+8. Updated lock_release to account for new added struct members
+9. Moved semaphore_elem to synch.h to avoid dereferencing error
+10. 
