@@ -8,8 +8,7 @@
 
 >> Fill in the names and email addresses of your group members.
 
-FirstName LastName <email@domain.example>
-FirstName LastName <email@domain.example>
+Johnathan Becker <historybuffjb@gmail.com>
 FirstName LastName <email@domain.example>
 
 ---- PRELIMINARIES ----
@@ -21,6 +20,7 @@ FirstName LastName <email@domain.example>
 >> preparing your submission, other than the Pintos documentation, course
 >> text, lecture notes, and course staff.
 
+
 			     ALARM CLOCK
 			     ===========
 
@@ -29,6 +29,8 @@ FirstName LastName <email@domain.example>
 >> A1: Copy here the declaration of each new or changed `struct' or
 >> `struct' member, global or static variable, `typedef', or
 >> enumeration.  Identify the purpose of each in 25 words or less.
+
+
 
 ---- ALGORITHMS ----
 

@@ -344,13 +344,32 @@ thread_foreach (thread_action_func *func, void *aux)
     }
 }
 
-/* Sets the current thread's priority to NEW_PRIORITY. */
+/* Sets the current thread's priority to NEW_PRIORITY. 
+   3 scenarios. If not under donation we update both
+   original_priority and priority. If under donation
+   and new_priority is less than priority than we just
+   update original_priority. Else we update priority */
 void
 thread_set_priority (int new_priority) 
 {
-  thread_current ()->priority = new_priority;
+  enum intr_level old_level;
+
+  old_level = intr_disable();
+
+  if(!thread_current()->has_donated_priority)
+  {
+    thread_current()->priority = new_priority;
+  }
+  else if(thread_current()->has_donated_priority < new_priority)
+  {
+    thread_current()->priority = new_priority;
+  }
+  thread_current()->original_priority = new_priority;
+
   /* check if current thread needs to yield */
   test_priority_yielding();
+
+  intr_set_level(old_level);
 }
 
 /* Returns the current thread's priority. */
@@ -477,8 +496,11 @@ init_thread (struct thread *t, const char *name, int priority)
   strlcpy (t->name, name, sizeof t->name);
   t->stack = (uint8_t *) t + PGSIZE;
   t->priority = priority;
+  t->original_priority = priority;
+  t->has_donated_priority = false;
+  t->waiting_lock = NULL;
+  list_init(&t->list_of_locks);
   t->magic = THREAD_MAGIC;
-
   old_level = intr_disable ();
   list_push_back (&all_list, &t->allelem);
   intr_set_level (old_level);
@@ -667,7 +689,7 @@ test_priority_yielding(void)
 }
 
 /* used as a pointer function to compare two threads and which one should wake first */
-static bool 
+bool 
 sleeping_list_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED)
 {
   /* get threads */
@@ -678,7 +700,7 @@ sleeping_list_less_func(const struct list_elem *l, const struct list_elem *r, vo
 }
 
 /* used as a pointer function to compare two threads and whether l has lower priority than r */
-static bool
+bool
 thread_priority_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED)
 {
   /* get threads */
@@ -687,3 +709,22 @@ thread_priority_less_func(const struct list_elem *l, const struct list_elem *r, 
   /*compare and return */
   return left->priority > right->priority;
 }
+
+/* used as a pointer function to compare two semaphores and whether l has lower priority than r */
+bool 
+sema_priority_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED)
+{
+  /* get semaphores */
+  struct semaphore_elem *left = list_entry(l, struct semaphore_elem, elem);
+  struct semaphore_elem *right = list_entry(r, struct semaphore_elem, elem);
+  /*compare and return */
+  return left->priority > right->priority;
+}
+
+/* sorts ready list */
+void 
+sort_ready_list(void)
+{
+  list_sort(&ready_list, thread_priority_less_func, NULL);
+}
+

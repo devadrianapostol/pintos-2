@@ -89,12 +89,13 @@ struct thread
     uint8_t *stack;                     /* Saved stack pointer. */
     int64_t wakeup_ticks;               /* # of ticks to next wake up */
     int priority;                       /* Priority. May have been donated */
-    int original_priority;              /* If donated this is original. If not this is same as priority */
-    bool has_donated                    /* true if donated priority otherwise false */ 
+    int original_priority;              /* Priority when created */
+    bool has_donated_priority;          /* Bool to see if under donation */
     struct list_elem allelem;           /* List element for all threads list. */
+    struct lock* waiting_lock;          /* Lock thread is waiting for */
 
-    /* current list of all locks thread has */
-    struct list locks_list;
+    /* List of locks thread owns */
+    struct list list_of_locks;
 
     /* Shared between thread.c and synch.c. */
     struct list_elem elem;              /* List element. */
@@ -146,7 +147,9 @@ int thread_get_load_avg (void);
 
 static void check_on_sleeping_threads(void);
 void thread_put_to_sleep(int64_t ticks);
-static bool sleeping_list_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED);
-static bool thread_priority_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED);
+bool sleeping_list_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED);
+bool thread_priority_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED);
+bool sema_priority_less_func(const struct list_elem *l, const struct list_elem *r, void *aux UNUSED);
+void sort_ready_list(void);
 
 #endif /* threads/thread.h */
